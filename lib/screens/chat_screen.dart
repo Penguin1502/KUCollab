@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flash_chat/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flash_chat/constants.dart';
 
 final _firestore = Firestore.instance;
-FirebaseUser loggedInUser;
+FirebaseUser loggedInUser; //old package being used, thats why its FirebaseUser object not User object
 
 class ChatScreen extends StatefulWidget {
   static const String id = 'chat_screen';
@@ -13,7 +14,7 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  final messageTextController = TextEditingController();
+  final messageTextController = TextEditingController(); //for clearing textfield using .clear() method. This CONTROLS the text field.
   final _auth = FirebaseAuth.instance;
 
   String messageText;
@@ -49,8 +50,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 Navigator.pop(context);
               }),
         ],
-        title: Text('⚡️Chat'),
-        backgroundColor: Colors.lightBlueAccent,
+        title: Text('고대 콜라브'),
+        backgroundColor: kuColor,
       ),
       body: SafeArea(
         child: Column(
@@ -65,7 +66,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 children: <Widget>[
                   Expanded(
                     child: TextField(
-                      controller: messageTextController,
+                      controller: messageTextController, //clear text field later
                       onChanged: (value) {
                         messageText = value;
                       },
@@ -99,8 +100,10 @@ class MessagesStream extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: _firestore.collection('messages').snapshots(),
-      builder: (context, snapshot) {
+      stream: _firestore.collection('messages').snapshots(), //source
+      builder: (context, snapshot) { //called everytime there's a change to the stream
+
+        //In case there's no data in our snapshot / when we're not yet connected to firebase.
         if (!snapshot.hasData) {
           return Center(
             child: CircularProgressIndicator(
@@ -108,6 +111,8 @@ class MessagesStream extends StatelessWidget {
             ),
           );
         }
+
+        //load the entire stream over again. Every time there's a change to it
         final messages = snapshot.data.documents.reversed;
         List<MessageBubble> messageBubbles = [];
         for (var message in messages) {
@@ -159,8 +164,7 @@ class MessageBubble extends StatelessWidget {
             ),
           ),
           Material(
-            borderRadius: isMe
-                ? BorderRadius.only(
+            borderRadius: isMe ? BorderRadius.only(
                     topLeft: Radius.circular(30.0),
                     bottomLeft: Radius.circular(30.0),
                     bottomRight: Radius.circular(30.0))
@@ -170,7 +174,7 @@ class MessageBubble extends StatelessWidget {
                     topRight: Radius.circular(30.0),
                   ),
             elevation: 5.0,
-            color: isMe ? Colors.lightBlueAccent : Colors.white,
+            color: isMe ? Color(0xFF990000) : Colors.white,
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
               child: Text(
